@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos Filtrados de la API SEACE</title>
+    <style>
+        /* Estilos básicos para el diseño */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #loading {
+            color: blue;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Datos Filtrados de la API SEACE</h1>
+    <p>Mostrando los campos: <strong>name</strong> y <strong>title</strong></p>
+    
+    <!-- Mensaje de carga inicial -->
+    <div id="loading" aria-live="polite">Cargando datos...</div>
+    
+    <!-- Tabla donde se mostrarán los datos -->
+    <table id="data-table" style="display: none;">
+        <thead>
+            <tr>
+                <th>Nombre (name)</th>
+                <th>Título (title)</th>
+
+                <!-- Nueva columna -->
+                <th>Descripción</th>
+                <th>Método de Contratación</th> 
+                
+
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se agregarán dinámicamente las filas -->
+        </tbody>
+    </table>
+
+    <script>
+        // URL de la API. Usamos un proxy local para evitar problemas de CORS.
+        const apiUrl = "http://localhost:8010/proxy/api/v1/release/seace_v3/914676";
+
+        // Referencias a los elementos del DOM
+        const loadingElement = document.getElementById("loading");
+        const tableElement = document.getElementById("data-table");
+        const tableBody = tableElement.querySelector("tbody");
+
+        /**
+         * Función principal para obtener datos de la API y mostrarlos en la tabla.
+         */
+        async function fetchAndDisplayData() {
+            try {
+                // Llamada a la API
+                const response = await fetch(apiUrl);
+
+                // Verificamos si hubo un error en la respuesta
+                if (!response.ok) {
+                    throw new Error(`Error al obtener datos: ${response.status}`);
+                }
+
+                // Parseamos la respuesta a JSON
+                const data = await response.json();
+
+                // Obtenemos el array de releases (o uno vacío si no existe)
+                const releases = data.releases || [];
+
+                // Iteramos sobre cada release para extraer y mostrar datos
+                releases.forEach(release => {
+                    // Obtenemos los valores deseados usando encadenamiento opcional
+                    const name = release?.tender?.procuringEntity?.name || "Sin información";
+                    const title = release?.tender?.title || "Sin información";
+                    
+                    // Extrae los nuevos datos
+                    const description = release?.tender?.description || "Sin descripción";
+                    const procurementMethodDetails = release?.tender?.procurementMethodDetails || "Sin método";
+
+                    // Creamos una fila para la tabla
+                    const row = document.createElement("tr");
+
+                    // Celda para el nombre
+                    const nameCell = document.createElement("td");
+                    nameCell.textContent = name;
+                    row.appendChild(nameCell);
+
+                    // Celda para el título
+                    const titleCell = document.createElement("td");
+                    titleCell.textContent = title;
+                    row.appendChild(titleCell);
+
+                    // Nuevas Celdas
+
+                    // Celda para la descripción
+                    const descriptionCell = document.createElement("td");
+                    descriptionCell.textContent = description;
+                    row.appendChild(descriptionCell);
+
+                    // Celda para el método de contratación
+                    const procurementMethodDetailsCell = document.createElement("td");
+                    procurementMethodDetailsCell.textContent = procurementMethodDetails;
+                    row.appendChild(procurementMethodDetailsCell);
+
+                    // Agregamos la fila a la tabla
+                    tableBody.appendChild(row);
+                });
+
+                // Ocultamos el mensaje de carga y mostramos la tabla
+                loadingElement.style.display = "none";
+                tableElement.style.display = "table";
+            } catch (error) {
+                // Si ocurre un error, mostramos un mensaje al usuario
+                loadingElement.textContent = `Error: ${error.message}`;
+                loadingElement.classList.add("error");
+                console.error(error); // También mostramos el error en la consola para depuración
+            }
+        }
+
+        // Ejecutamos la función al cargar la página
+        fetchAndDisplayData();
+    </script>
+</body>
+</html>

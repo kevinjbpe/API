@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
+<!-- TODO: Agregar más columnas y un boton desplegable -->
+<!-- FIXME: Mejorar el diseño y otros archivos como CSS -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datos Filtrados de la API SEACE</title>
     <style>
+        
         /* Estilos básicos para el diseño */
         body {
             font-family: Arial, sans-serif;
@@ -39,8 +44,8 @@
     <p>Mostrando los campos: <strong>name</strong> y <strong>title</strong></p>
     
     <!-- Mensaje de carga inicial -->
-    <div id="loading" aria-live="polite">Cargando datos...</div>
-    
+    <div id="loading" aria-live="polite">Cargando datos...</div>    
+
     <!-- Tabla donde se mostrarán los datos -->
     <table id="data-table" style="display: none;">
         <thead>
